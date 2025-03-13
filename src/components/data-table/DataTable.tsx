@@ -5,6 +5,7 @@ import { useDataTable } from "./hooks/useDataTable";
 import { DataTableHeader } from "./DataTableHeader";
 import { DataTableBody } from "./DataTableBody";
 import { DataTablePagination } from "./DataTablePagination";
+import { DataTableMobile } from "./DataTableMobile";
 
 interface DataTableProps<TData> {
   data: TData[];
@@ -27,18 +28,26 @@ export function DataTable<TData>({
   });
 
   return (
-    <div className="flex flex-col gap-4">
-      <Card className="p-0">
-        <CardContent className="p-0">
-          <Table className="table-fixed">
-            <DataTableHeader table={table} />
-            <DataTableBody table={table} />
-          </Table>
-        </CardContent>
-      </Card>
+    <div className="flex flex-col gap-2 m-4">
+      {/* Desktop View */}
+      <div className="hidden md:block">
+        <Card className="p-0 overflow-hidden">
+          <CardContent className="p-0">
+            <Table className="table-fixed">
+              <DataTableHeader table={table} />
+              <DataTableBody table={table} />
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Mobile View */}
+      <div className="md:hidden">
+        <DataTableMobile table={table} />
+      </div>
 
       <Card className="p-0">
-        <CardContent className="p-3">
+        <CardContent className="py-3 px-4">
           <DataTablePagination table={table} />
         </CardContent>
       </Card>

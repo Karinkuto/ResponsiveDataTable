@@ -88,7 +88,7 @@ export default function UsersTable() {
   }, []);
 
   return (
-    <div className="w-[60%]">
+    <div >
       <DataTable
         data={data}
         columns={columns}

@@ -38,7 +38,7 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
         </Select>
       </div>
 
-      <div className="text-muted-foreground flex grow justify-end text-sm whitespace-nowrap">
+      <div className="text-muted-foreground flex grow justify-end text-sm whitespace-nowrap min-w-[5rem]">
         <p className="text-muted-foreground text-sm whitespace-nowrap" aria-live="polite">
           <span className="text-foreground">
             {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}-
