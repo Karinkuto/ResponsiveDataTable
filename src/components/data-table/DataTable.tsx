@@ -6,6 +6,7 @@ import { DataTableHeader } from "./DataTableHeader";
 import { DataTableBody } from "./DataTableBody";
 import { DataTablePagination } from "./DataTablePagination";
 import { DataTableMobile } from "./DataTableMobile";
+import { useEffect, useState } from "react";
 
 interface DataTableProps<TData> {
   data: TData[];
@@ -18,14 +19,38 @@ export function DataTable<TData>({
   data, 
   columns, 
   initialSorting,
-  initialPageSize,
+  initialPageSize = 5,
 }: DataTableProps<TData>) {
+  const [isMobile, setIsMobile] = useState(false);
+  
   const table = useDataTable({
     data,
     columns,
     initialSorting,
     initialPageSize,
   });
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Initial check
+    checkMobile();
+    
+    // Add resize listener
+    window.addEventListener('resize', checkMobile);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Force 5 rows per page on mobile
+  useEffect(() => {
+    if (isMobile) {
+      table.setPageSize(5);
+    }
+  }, [isMobile, table]);
 
   return (
     <div className="flex flex-col gap-2 m-4">
@@ -48,7 +73,10 @@ export function DataTable<TData>({
 
       <Card className="p-0">
         <CardContent className="py-3 px-4">
-          <DataTablePagination table={table} />
+          <DataTablePagination 
+            table={table} 
+            isMobile={isMobile}
+          />
         </CardContent>
       </Card>
     </div>

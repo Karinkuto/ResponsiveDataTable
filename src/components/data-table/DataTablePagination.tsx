@@ -5,40 +5,49 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/pagination";
 import { ChevronFirstIcon, ChevronLastIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useId } from "react";
+import { cn } from "@/lib/utils";
 
 interface DataTablePaginationProps<TData> {
   table: TableType<TData>;
+  isMobile?: boolean;
 }
 
-export function DataTablePagination<TData>({ table }: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData>({ table, isMobile }: DataTablePaginationProps<TData>) {
   const id = useId();
 
   return (
     <div className="flex items-center justify-between gap-8">
-      <div className="flex items-center gap-3">
-        <Label htmlFor={id} className="max-sm:sr-only">
-          Rows per page
-        </Label>
-        <Select
-          value={table.getState().pagination.pageSize.toString()}
-          onValueChange={(value) => {
-            table.setPageSize(Number(value));
-          }}
-        >
-          <SelectTrigger id={id} className="w-fit whitespace-nowrap">
-            <SelectValue placeholder="Select number of results" />
-          </SelectTrigger>
-          <SelectContent className="[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2">
-            {[5, 10, 25, 50].map((pageSize) => (
-              <SelectItem key={pageSize} value={pageSize.toString()}>
-                {pageSize}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {/* Rows per page selector - hidden on mobile */}
+      {!isMobile && (
+        <div className="flex items-center gap-3">
+          <Label htmlFor={id}>
+            Rows per page
+          </Label>
+          <Select
+            value={table.getState().pagination.pageSize.toString()}
+            onValueChange={(value) => {
+              table.setPageSize(Number(value));
+            }}
+          >
+            <SelectTrigger id={id} className="w-fit whitespace-nowrap">
+              <SelectValue placeholder="Select number of results" />
+            </SelectTrigger>
+            <SelectContent className="[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2">
+              {[5, 10, 25, 50].map((pageSize) => (
+                <SelectItem key={pageSize} value={pageSize.toString()}>
+                  {pageSize}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
-      <div className="text-muted-foreground flex grow justify-end text-sm whitespace-nowrap min-w-[5rem]">
+      {/* Page info - moved to left on mobile */}
+      <div className={cn(
+        "text-muted-foreground text-sm whitespace-nowrap min-w-[5rem]",
+        isMobile ? "flex-1" : "flex grow justify-end"
+      )}>
         <p className="text-muted-foreground text-sm whitespace-nowrap" aria-live="polite">
           <span className="text-foreground">
             {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}-
@@ -55,6 +64,7 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
         </p>
       </div>
 
+      {/* Navigation buttons */}
       <div>
         <Pagination>
           <PaginationContent>

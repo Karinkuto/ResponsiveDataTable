@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ColumnDef } from "@tanstack/react-table";
-import { TableItem, fetchTableData } from "@/data/sample-table-data";
+import { fetchTableData } from "@/data/sample-table-data";
 import { DataTable } from "./data-table/DataTable";
 
 export type TableItem = {
@@ -142,7 +142,7 @@ export default function UsersTable() {
   }, []);
 
   return (
-    <div >
+    <div className="w-full">
       <DataTable
         data={data}
         columns={columns}
