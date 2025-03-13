@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ColumnDef } from "@tanstack/react-table";
-import { DataTable } from "./DataTable";
 import { TableItem, fetchTableData } from "@/data/sample-table-data";
+import { DataTable } from "./data-table/DataTable";
 
 const columns: ColumnDef<TableItem>[] = [
   {
