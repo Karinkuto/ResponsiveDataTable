@@ -38,3 +38,122 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+
+# Data Table Component
+
+A reusable, efficient data table component built with Next.js, TanStack Table, and ShadcN UI components.
+
+## Features
+
+- 📊 Sortable columns
+- 📱 Responsive design
+- 🔢 Pagination
+- ✅ Row selection
+- 🎨 Clean, modern UI using ShadcN components
+- 🚀 Optimized performance
+- 📦 Minimal bundle size
+
+## Installation
+
+1. First, install the required dependencies:
+
+```bash
+# Install ShadcN UI components
+pnpm dlx shadcn@latest add table
+pnpm dlx shadcn@latest add card
+pnpm dlx shadcn@latest add button
+pnpm dlx shadcn@latest add checkbox
+pnpm dlx shadcn@latest add select
+pnpm dlx shadcn@latest add badge
+pnpm dlx shadcn@latest add label
+pnpm dlx shadcn@latest add pagination
+
+# Install TanStack Table
+pnpm add @tanstack/react-table
+```
+
+2. Copy the `data-table` folder to your components directory:
+```
+src/
+  components/
+    data-table/
+      hooks/
+        useDataTable.ts
+      DataTable.tsx
+      DataTableBody.tsx
+      DataTableHeader.tsx
+      DataTablePagination.tsx
+```
+
+## Usage
+
+```tsx
+import { DataTable } from "@/components/data-table/DataTable";
+import { ColumnDef } from "@tanstack/react-table";
+
+// Define your data type
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  status: string;
+}
+
+// Define your columns
+const columns: ColumnDef<User>[] = [
+  {
+    header: "Name",
+    accessorKey: "name",
+  },
+  {
+    header: "Email",
+    accessorKey: "email",
+  },
+  {
+    header: "Status",
+    accessorKey: "status",
+  },
+];
+
+// Use the DataTable component
+export default function YourComponent() {
+  const data = [/* your data array */];
+
+  return (
+    <DataTable
+      data={data}
+      columns={columns}
+      initialSorting={[{ id: "name", desc: false }]}
+      initialPageSize={5}
+    />
+  );
+}
+```
+
+## Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `data` | `T[]` | Array of data items to display |
+| `columns` | `ColumnDef<T>[]` | Column definitions for the table |
+| `initialSorting` | `SortingState` | Optional initial sorting state |
+| `initialPageSize` | `number` | Optional initial page size (default: 5) |
+
+## Development
+
+```bash
+# Start the development server
+pnpm dev
+
+# Build for production
+pnpm build
+
+# Run production build
+pnpm start
+```
+
+## Learn More
+
+- [TanStack Table Documentation](https://tanstack.com/table/latest)
+- [ShadcN UI Documentation](https://ui.shadcn.com)
+- [Next.js Documentation](https://nextjs.org/docs)
