@@ -6,6 +6,10 @@ export type TableItem = {
   flag: string;
   status: "Active" | "Inactive" | "Pending";
   balance: number;
+  department: string;
+  role: string;
+  joinDate: string;
+  performance: string;
 };
 
 export const fetchTableData = async (): Promise<TableItem[]> => {

@@ -8,6 +8,20 @@ import { ColumnDef } from "@tanstack/react-table";
 import { TableItem, fetchTableData } from "@/data/sample-table-data";
 import { DataTable } from "./data-table/DataTable";
 
+export type TableItem = {
+  id: string;
+  name: string;
+  email: string;
+  location: string;
+  flag: string;
+  status: "Active" | "Inactive" | "Pending";
+  balance: number;
+  department: string;
+  role: string;
+  joinDate: string;
+  performance: string;
+};
+
 const columns: ColumnDef<TableItem>[] = [
   {
     id: "select",
@@ -50,6 +64,46 @@ const columns: ColumnDef<TableItem>[] = [
       </div>
     ),
     size: 180,
+  },
+  {
+    header: "Department",
+    accessorKey: "department",
+    size: 150,
+  },
+  {
+    header: "Role",
+    accessorKey: "role",
+    size: 180,
+  },
+  {
+    header: "Join Date",
+    accessorKey: "joinDate",
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("joinDate"));
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+      });
+    },
+    size: 120,
+  },
+  {
+    header: "Performance",
+    accessorKey: "performance",
+    cell: ({ row }) => (
+      <Badge
+        className={cn(
+          row.getValue("performance") === "Excellent" && "bg-green-100 text-green-800",
+          row.getValue("performance") === "Good" && "bg-blue-100 text-blue-800",
+          row.getValue("performance") === "Average" && "bg-yellow-100 text-yellow-800",
+          row.getValue("performance") === "Poor" && "bg-red-100 text-red-800"
+        )}
+      >
+        {row.getValue("performance")}
+      </Badge>
+    ),
+    size: 120,
   },
   {
     header: "Status",

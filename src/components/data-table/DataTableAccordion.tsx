@@ -1,5 +1,6 @@
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface DataTableAccordionProps {
   isOpen: boolean;
@@ -23,22 +24,39 @@ export function DataTableAccordion({ isOpen, onToggle, summary, children }: Data
       >
         <div className="flex-1">{summary}</div>
         <div className="absolute bottom-3 right-4">
-          <ChevronDown
-            className={cn(
-              "h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200",
-              isOpen && "rotate-180"
-            )}
-          />
+          <motion.div
+            initial={false}
+            animate={{ rotate: isOpen ? 180 : 0 }}
+            transition={{ duration: 0.2, ease: [0.4, 0.0, 0.2, 1] }}
+          >
+            <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+          </motion.div>
         </div>
       </button>
-      <div
-        className={cn(
-          "overflow-hidden transition-all duration-200 ease-in-out",
-          !isOpen && "h-0"
+      <AnimatePresence mode="sync" initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0 }}
+            animate={{ 
+              height: "auto",
+              transition: {
+                duration: 0.25,
+                ease: [0.4, 0.0, 0.2, 1]
+              }
+            }}
+            exit={{ 
+              height: 0,
+              transition: {
+                duration: 0.25,
+                ease: [0.4, 0.0, 0.2, 1]
+              }
+            }}
+            className="overflow-hidden"
+          >
+            {children}
+          </motion.div>
         )}
-      >
-        {children}
-      </div>
+      </AnimatePresence>
     </div>
   );
 } 

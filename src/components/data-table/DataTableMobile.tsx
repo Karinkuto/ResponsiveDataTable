@@ -24,13 +24,10 @@ export function DataTableMobile<TData>({
   summaryColumns = ["name", "email", "status"],
   renderSummary,
 }: DataTableMobileProps<TData>) {
-  const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
+  const [openItemId, setOpenItemId] = useState<string | null>(null);
 
   const toggleItem = (id: string) => {
-    setOpenItems(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
+    setOpenItemId(prev => prev === id ? null : id);
   };
 
   const getRowValue = (row: Row<TData>, columnId: string) => {
@@ -39,7 +36,7 @@ export function DataTableMobile<TData>({
   };
 
   return (
-    <div className="space-y-2">
+    <div className="grid gap-2">
       {table.getRowModel().rows.map((row) => {
         // Get the columns to show in expanded view
         const expandedColumns = row.getVisibleCells().filter(
@@ -54,7 +51,7 @@ export function DataTableMobile<TData>({
           <Card key={row.id} className="p-0">
             <CardContent className="p-0">
               <DataTableAccordion
-                isOpen={openItems[row.id] || false}
+                isOpen={openItemId === row.id}
                 onToggle={() => toggleItem(row.id)}
                 summary={
                   renderSummary ? (
