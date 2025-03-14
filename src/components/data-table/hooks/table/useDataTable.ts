@@ -24,6 +24,23 @@ const arrayFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
   return filterValue.includes(value);
 };
 
+// Custom filter function for handling string searches
+const stringFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
+  // If no filter value or not a string, don't filter
+  if (filterValue === undefined || filterValue === null || filterValue === "" || typeof filterValue !== 'string') {
+    return true;
+  }
+
+  const value = row.getValue(columnId);
+  // Handle null or undefined values
+  if (value === undefined || value === null) {
+    return false;
+  }
+
+  // Case-insensitive search for string values
+  return String(value).toLowerCase().includes(filterValue.toLowerCase());
+};
+
 interface UseDataTableProps<TData> {
   data: TData[];
   columns: ColumnDef<TData>[];
@@ -56,7 +73,20 @@ export function useDataTable<TData>({
     if (typeof column === 'object' && column !== null) {
       return {
         ...column,
-        filterFn: arrayFilterFn,
+        filterFn: (row, columnId, value) => {
+          // Use array filter for array filter values
+          if (Array.isArray(value)) {
+            return arrayFilterFn(row, columnId, value);
+          }
+          
+          // Use string filter for string filter values
+          if (typeof value === 'string') {
+            return stringFilterFn(row, columnId, value);
+          }
+          
+          // Default case - no filtering
+          return true;
+        },
       };
     }
     return column;
