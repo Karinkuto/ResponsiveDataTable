@@ -1,13 +1,12 @@
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { ReactNode } from "react";
+// Import types from the shared types directory
+import { DataTableAccordionProps } from "../../types/table.types";
 
-interface DataTableAccordionProps {
-  isOpen: boolean;
-  onToggle: () => void;
-  summary: React.ReactNode;
-  children: React.ReactNode;
-}
+// Remove interface since it's now in the types file
+// interface DataTableAccordionProps {...}
 
 export function DataTableAccordion({ isOpen, onToggle, summary, children }: DataTableAccordionProps) {
   return (

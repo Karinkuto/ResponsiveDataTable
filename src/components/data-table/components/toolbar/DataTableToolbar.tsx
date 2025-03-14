@@ -24,32 +24,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-
-interface DataTableToolbarProps<TData> {
-  table: Table<TData>;
-  searchColumn?: string;
-  searchableColumns?: {
-    id: string;
-    title: string;
-  }[];
-  onAddClick?: () => void;
-  onRefreshClick?: () => void;
-  onExportClick?: () => void;
-  onImportClick?: () => void;
-  filterableColumns?: {
-    id: string;
-    title: string;
-    options: {
-      label: string;
-      value: string;
-    }[];
-  }[];
-  className?: string;
-  summaryColumns?: string[];
-}
+// Import our new hooks
+import { useTableSearch } from "../../hooks/table/useTableSearch";
+// Import types from the shared types directory
+import { DataTableToolbarProps } from "../../types/table.types";
 
 export function DataTableToolbar<TData>({
   table,
@@ -64,28 +44,15 @@ export function DataTableToolbar<TData>({
   summaryColumns = [],
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
-  const [selectedSearchColumn, setSelectedSearchColumn] = useState<string | undefined>(
-    searchColumn || (searchableColumns.length > 0 ? searchableColumns[0].id : undefined)
-  );
-
-  // Function to handle search across multiple columns
-  const handleSearch = (value: string) => {
-    if (selectedSearchColumn) {
-      table.getColumn(selectedSearchColumn)?.setFilterValue(value);
-    }
-  };
-
-  // Get current search value
-  const currentSearchValue = selectedSearchColumn
-    ? (table.getColumn(selectedSearchColumn)?.getFilterValue() as string) ?? ""
-    : "";
-
-  // Clear search function
-  const clearSearch = () => {
-    if (selectedSearchColumn) {
-      table.getColumn(selectedSearchColumn)?.setFilterValue("");
-    }
-  };
+  
+  // Use our custom hook for search functionality
+  const {
+    selectedSearchColumn,
+    setSelectedSearchColumn,
+    searchValue,
+    handleSearch,
+    clearSearch
+  } = useTableSearch(table, searchColumn, searchableColumns, 300);
 
   return (
     <Card className={cn("p-0", className)}>
@@ -117,14 +84,14 @@ export function DataTableToolbar<TData>({
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                     placeholder={`Search${selectedSearchColumn ? '...' : ''}`}
-                    value={currentSearchValue}
+                    value={searchValue}
                     onChange={(event) => handleSearch(event.target.value)}
                     className="w-full pl-8 h-9 focus-visible:ring-1"
                   />
-                  {currentSearchValue && (
+                  {searchValue && (
                   <Button
                     variant="ghost"
-                      onClick={clearSearch}
+                    onClick={clearSearch}
                     className="absolute right-1 top-1.5 h-6 w-6 p-0"
                   >
                     <X className="h-4 w-4" />

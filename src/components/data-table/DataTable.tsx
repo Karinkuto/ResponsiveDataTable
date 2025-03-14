@@ -1,50 +1,21 @@
 import { ColumnDef, SortingState, VisibilityState } from "@tanstack/react-table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table } from "@/components/ui/table";
-import { useDataTable } from "./hooks/useDataTable";
-import { useSummaryColumns } from "./hooks/useSummaryColumns";
-import { DataTableHeader } from "./DataTableHeader";
-import { DataTableBody } from "./DataTableBody";
-import { DataTablePagination } from "./DataTablePagination";
-import { DataTableMobile } from "./DataTableMobile";
-import { DataTableRowActions, DataTableRowActionsProps, ActionItem, ActionGroup } from "./DataTableRowActions";
-import { DataTableToolbar } from "./DataTableToolbar";
-import { DataTableToolbarMobile } from "./DataTableToolbarMobile";
-import { useEffect, useState } from "react";
-
-interface DataTableProps<TData> {
-  data: TData[];
-  columns: ColumnDef<TData>[];
-  initialSorting?: SortingState;
-  initialPageSize?: number;
-  enableRowSelection?: boolean;
-  rowActions?: (ActionItem<TData> | ActionGroup<TData>)[];
-  actionsColumnId?: string;
-  searchColumn?: string;
-  searchableColumns?: {
-    id: string;
-    title: string;
-  }[];
-  onAddClick?: () => void;
-  onRefreshClick?: () => void;
-  onExportClick?: () => void;
-  onImportClick?: () => void;
-  filterableColumns?: {
-    id: string;
-    title: string;
-    options: {
-      label: string;
-      value: string;
-    }[];
-  }[];
-  initialColumnVisibility?: VisibilityState;
-  className?: string;
-  /**
-   * Column IDs to show in the mobile accordion summary.
-   * If not provided, the first 2-4 columns will be used.
-   */
-  summaryColumns?: string[];
-}
+import { useDataTable } from "./hooks/table/useDataTable";
+import { useSummaryColumns } from "./hooks/table/useSummaryColumns";
+import { DataTableHeader } from "./components/core/DataTableHeader";
+import { DataTableBody } from "./components/core/DataTableBody";
+import { DataTablePagination } from "./components/pagination/DataTablePagination";
+import { DataTableMobile } from "./components/mobile/DataTableMobile";
+import { DataTableRowActions, DataTableRowActionsProps, ActionItem, ActionGroup } from "./components/actions/DataTableRowActions";
+import { DataTableToolbar } from "./components/toolbar/DataTableToolbar";
+import { DataTableToolbarMobile } from "./components/toolbar/DataTableToolbarMobile";
+import { useEffect } from "react";
+// Import our new hooks
+import { useResponsive } from "./hooks/ui/useResponsive";
+import { useTableColumns } from "./hooks/table/useTableColumns";
+// Import types from the types directory
+import { DataTableProps } from "./types/table.types";
 
 export function DataTable<TData>({ 
   data, 
@@ -65,31 +36,11 @@ export function DataTable<TData>({
   className,
   summaryColumns,
 }: DataTableProps<TData>) {
-  const [isMobile, setIsMobile] = useState(false);
+  // Replace custom implementation with the responsive hook
+  const { isMobile } = useResponsive();
   
-  // Add actions column if rowActions is provided and set enableHiding to true by default for all columns
-  const columnsWithActions = rowActions 
-    ? [
-        ...columns.map(col => ({
-          ...col,
-          enableHiding: col.enableHiding ?? true,
-        })),
-        {
-          id: actionsColumnId,
-          cell: ({ row }) => (
-            <DataTableRowActions 
-              row={row} 
-              actions={rowActions} 
-            />
-          ),
-          size: 50,
-          enableHiding: false,
-        } as ColumnDef<TData>,
-      ] 
-    : columns.map(col => ({
-        ...col,
-        enableHiding: col.enableHiding ?? true,
-      }));
+  // Use the table columns hook to handle column manipulation
+  const columnsWithActions = useTableColumns(columns, rowActions, actionsColumnId);
 
   const table = useDataTable({
     data,
@@ -102,21 +53,6 @@ export function DataTable<TData>({
 
   // Get the active summary columns
   const activeSummaryColumns = useSummaryColumns(table, summaryColumns, actionsColumnId);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    // Initial check
-    checkMobile();
-    
-    // Add resize listener
-    window.addEventListener('resize', checkMobile);
-    
-    // Cleanup
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   // Force 5 rows per page on mobile
   useEffect(() => {

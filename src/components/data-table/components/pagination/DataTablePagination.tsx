@@ -7,14 +7,24 @@ import { ChevronFirstIcon, ChevronLastIcon, ChevronLeftIcon, ChevronRightIcon } 
 import { useId } from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
-
-interface DataTablePaginationProps<TData> {
-  table: TableType<TData>;
-  isMobile?: boolean;
-}
+import { usePagination } from "../../hooks/table/usePagination";
+import { DataTablePaginationProps } from "../../types/table.types";
 
 export function DataTablePagination<TData>({ table, isMobile }: DataTablePaginationProps<TData>) {
   const id = useId();
+  
+  const {
+    startItem,
+    endItem,
+    totalItems,
+    canPreviousPage,
+    canNextPage,
+    firstPage,
+    previousPage,
+    nextPage,
+    lastPage,
+    setPageSize
+  } = usePagination(table);
 
   return (
     <Card className="p-0">
@@ -29,7 +39,7 @@ export function DataTablePagination<TData>({ table, isMobile }: DataTablePaginat
               <Select
                 value={table.getState().pagination.pageSize.toString()}
                 onValueChange={(value) => {
-                  table.setPageSize(Number(value));
+                  setPageSize(Number(value));
                 }}
               >
                 <SelectTrigger id={id} className="w-fit whitespace-nowrap">
@@ -53,17 +63,9 @@ export function DataTablePagination<TData>({ table, isMobile }: DataTablePaginat
           )}>
             <p className="text-muted-foreground text-sm whitespace-nowrap" aria-live="polite">
               <span className="text-foreground">
-                {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}-
-                {Math.min(
-                  Math.max(
-                    table.getState().pagination.pageIndex * table.getState().pagination.pageSize +
-                      table.getState().pagination.pageSize,
-                    0,
-                  ),
-                  table.getRowCount(),
-                )}
+                {startItem}-{endItem}
               </span>{" "}
-              of <span className="text-foreground">{table.getRowCount().toString()}</span>
+              of <span className="text-foreground">{totalItems}</span>
             </p>
           </div>
 
@@ -76,8 +78,8 @@ export function DataTablePagination<TData>({ table, isMobile }: DataTablePaginat
                     size="icon"
                     variant="outline"
                     className="disabled:pointer-events-none disabled:opacity-50"
-                    onClick={() => table.firstPage()}
-                    disabled={!table.getCanPreviousPage()}
+                    onClick={firstPage}
+                    disabled={!canPreviousPage}
                     aria-label="Go to first page"
                   >
                     <ChevronFirstIcon size={16} aria-hidden="true" />
@@ -88,8 +90,8 @@ export function DataTablePagination<TData>({ table, isMobile }: DataTablePaginat
                     size="icon"
                     variant="outline"
                     className="disabled:pointer-events-none disabled:opacity-50"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
+                    onClick={previousPage}
+                    disabled={!canPreviousPage}
                     aria-label="Go to previous page"
                   >
                     <ChevronLeftIcon size={16} aria-hidden="true" />
@@ -100,8 +102,8 @@ export function DataTablePagination<TData>({ table, isMobile }: DataTablePaginat
                     size="icon"
                     variant="outline"
                     className="disabled:pointer-events-none disabled:opacity-50"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
+                    onClick={nextPage}
+                    disabled={!canNextPage}
                     aria-label="Go to next page"
                   >
                     <ChevronRightIcon size={16} aria-hidden="true" />
@@ -112,8 +114,8 @@ export function DataTablePagination<TData>({ table, isMobile }: DataTablePaginat
                     size="icon"
                     variant="outline"
                     className="disabled:pointer-events-none disabled:opacity-50"
-                    onClick={() => table.lastPage()}
-                    disabled={!table.getCanNextPage()}
+                    onClick={lastPage}
+                    disabled={!canNextPage}
                     aria-label="Go to last page"
                   >
                     <ChevronLastIcon size={16} aria-hidden="true" />

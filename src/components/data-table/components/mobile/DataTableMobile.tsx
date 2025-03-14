@@ -4,26 +4,12 @@ import { flexRender } from "@tanstack/react-table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DataTableAccordion } from "./DataTableAccordion";
-import { useState, useEffect } from "react";
 import React from "react";
-
-interface DataTableMobileProps<TData> {
-  table: TableType<TData>;
-  /**
-   * Column IDs to show in the accordion summary.
-   * First column is treated as the title.
-   * If not provided, the first 2-4 columns will be used (min 2, max 4).
-   */
-  summaryColumns?: string[];
-  /**
-   * Optional custom render function for the summary
-   */
-  renderSummary?: (row: TData) => React.ReactNode;
-  /**
-   * Column ID for the actions column
-   */
-  actionsColumnId?: string;
-}
+// Import our new hooks
+import { useAccordion } from "../../hooks/ui/useAccordion";
+import { useColumnVisibility } from "../../hooks/table/useColumnVisibility";
+// Import types from the shared types directory
+import { DataTableMobileProps } from "../../types/table.types";
 
 export function DataTableMobile<TData>({ 
   table, 
@@ -31,36 +17,12 @@ export function DataTableMobile<TData>({
   renderSummary,
   actionsColumnId,
 }: DataTableMobileProps<TData>) {
-  const [openItemId, setOpenItemId] = useState<string | null>(null);
+  // Use the accordion hook for open/close state
+  const { openItemId, toggleItem } = useAccordion();
   
-  // Store original column visibility state
-  const [originalColumnVisibility, setOriginalColumnVisibility] = useState({});
+  // Use the column visibility hook to handle visibility changes
+  useColumnVisibility(table, true);
   
-  // When component mounts, save the original column visibility and make all columns visible
-  useEffect(() => {
-    // Save original visibility state
-    const currentVisibility = table.getState().columnVisibility;
-    setOriginalColumnVisibility(currentVisibility);
-    
-    // Make all columns visible in mobile view
-    const allColumns = table.getAllColumns();
-    const allVisible = allColumns.reduce((acc, column) => {
-      acc[column.id] = true;
-      return acc;
-    }, {} as Record<string, boolean>);
-    
-    table.setColumnVisibility(allVisible);
-    
-    // Restore original visibility when component unmounts
-    return () => {
-      table.setColumnVisibility(currentVisibility);
-    };
-  }, [table]);
-
-  const toggleItem = (id: string) => {
-    setOpenItemId(prev => prev === id ? null : id);
-  };
-
   const getRowValue = (row: Row<TData>, columnId: string) => {
     const value = row.getValue(columnId);
     return value != null ? String(value) : "";

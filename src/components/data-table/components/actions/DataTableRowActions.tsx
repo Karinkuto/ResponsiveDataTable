@@ -34,8 +34,6 @@ export function DataTableRowActions<TData>({
   actions,
   dropdownLabel = "Actions",
 }: DataTableRowActionsProps<TData>) {
-  console.log("Rendering DataTableRowActions with:", { row, actions }); // Debug log
-
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
@@ -45,7 +43,6 @@ export function DataTableRowActions<TData>({
           className="h-8 w-8 p-0 data-[state=open]:bg-muted"
           onClick={(e) => {
             e.stopPropagation();
-            console.log("Dropdown trigger clicked"); // Debug log
           }}
         >
           <span className="sr-only">Open menu</span>
@@ -80,7 +77,6 @@ export function DataTableRowActions<TData>({
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        console.log("Action clicked:", action.label); // Debug log
                         action.onClick(row.original);
                       }}
                       disabled={isDisabled}
@@ -104,7 +100,6 @@ export function DataTableRowActions<TData>({
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  console.log("Action clicked:", action.label); // Debug log
                   action.onClick(row.original);
                 }}
                 disabled={isDisabled}

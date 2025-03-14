@@ -3,10 +3,7 @@ import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { flexRender } from "@tanstack/react-table";
-
-interface DataTableHeaderProps<TData> {
-  table: TableType<TData>;
-}
+import { DataTableHeaderProps } from "../../types/table.types";
 
 export function DataTableHeader<TData>({ table }: DataTableHeaderProps<TData>) {
   return (

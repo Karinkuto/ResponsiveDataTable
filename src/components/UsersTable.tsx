@@ -3,13 +3,11 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ColumnDef, VisibilityState } from "@tanstack/react-table";
 import { fetchTableData } from "@/data/sample-table-data";
-import { DataTable } from "./data-table/DataTable";
+import { DataTable, ActionItem, ActionGroup } from "@/components/data-table";
 import { toast } from "sonner";
-import { Copy, Eye, MoreHorizontal, Pencil, Plus, UserPlus } from "lucide-react";
-import { ActionItem, ActionGroup } from "./data-table/DataTableRowActions";
+import { Copy, Eye, Pencil, UserPlus } from "lucide-react";
 
 export type TableItem = {
   id: string;
@@ -31,12 +29,10 @@ const getDefaultActions = <TData extends { id: string }>(
   onEdit?: (data: TData) => void,
   onCopy?: (data: TData) => void,
 ): (ActionItem<TData> | ActionGroup<TData>)[] => {
-  console.log("Generating default actions"); // Debug log
   return [
     {
       label: "View details",
       onClick: (row: TData) => {
-        console.log("View action clicked", row); // Debug log
         if (onView) {
           onView(row);
         } else {
@@ -51,7 +47,6 @@ const getDefaultActions = <TData extends { id: string }>(
         {
           label: "Edit",
           onClick: (row: TData) => {
-            console.log("Edit action clicked", row); // Debug log
             if (onEdit) {
               onEdit(row);
             } else {
@@ -63,7 +58,6 @@ const getDefaultActions = <TData extends { id: string }>(
         {
           label: "Copy ID",
           onClick: (row: TData) => {
-            console.log("Copy action clicked", row); // Debug log
             if (onCopy) {
               onCopy(row);
             } else {
@@ -191,7 +185,6 @@ export default function UsersTable() {
   };
 
   const handleEdit = (user: TableItem) => {
-    console.log("Custom edit handler", user); // Debug log
     toast.info(`Editing ${user.name}`, {
       description: "Opening edit form...",
     });
@@ -210,7 +203,6 @@ export default function UsersTable() {
       {
         label: "Send Message",
         onClick: (user: TableItem) => {
-          console.log("Send message action clicked", user); // Debug log
           toast.info(`Sending message to ${user.name}`, {
             description: `Opening message composer for ${user.email}`,
           });
@@ -252,8 +244,6 @@ export default function UsersTable() {
       ],
     },
   ];
-
-  console.log("Rendering UsersTable with actions:", [...actions, customActions]); // Debug log
 
   return (
     <div className="w-full">

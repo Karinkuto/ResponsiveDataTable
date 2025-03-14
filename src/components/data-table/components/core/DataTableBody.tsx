@@ -1,10 +1,11 @@
 import { Table as TableType } from "@tanstack/react-table";
 import { TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { flexRender } from "@tanstack/react-table";
+// Import types from the shared types directory
+import { DataTableBodyProps } from "../../types/table.types";
 
-interface DataTableBodyProps<TData> {
-  table: TableType<TData>;
-}
+// Remove interface since it's now in the types file
+// interface DataTableBodyProps<TData> {...}
 
 export function DataTableBody<TData>({ table }: DataTableBodyProps<TData>) {
   return (
