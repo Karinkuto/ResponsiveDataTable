@@ -6,6 +6,7 @@ import { DataTableHeader } from "./DataTableHeader";
 import { DataTableBody } from "./DataTableBody";
 import { DataTablePagination } from "./DataTablePagination";
 import { DataTableMobile } from "./DataTableMobile";
+import { DataTableRowActions, DataTableRowActionsProps, ActionItem, ActionGroup } from "./DataTableRowActions";
 import { useEffect, useState } from "react";
 
 interface DataTableProps<TData> {
@@ -13,6 +14,9 @@ interface DataTableProps<TData> {
   columns: ColumnDef<TData>[];
   initialSorting?: SortingState;
   initialPageSize?: number;
+  enableRowSelection?: boolean;
+  rowActions?: (ActionItem<TData> | ActionGroup<TData>)[];
+  actionsColumnId?: string;
 }
 
 export function DataTable<TData>({ 
@@ -20,14 +24,35 @@ export function DataTable<TData>({
   columns, 
   initialSorting,
   initialPageSize = 5,
+  enableRowSelection = false,
+  rowActions,
+  actionsColumnId = "actions",
 }: DataTableProps<TData>) {
   const [isMobile, setIsMobile] = useState(false);
   
+  // Add actions column if rowActions is provided
+  const columnsWithActions = rowActions 
+    ? [
+        ...columns,
+        {
+          id: actionsColumnId,
+          cell: ({ row }) => (
+            <DataTableRowActions 
+              row={row} 
+              actions={rowActions} 
+            />
+          ),
+          size: 50,
+        } as ColumnDef<TData>,
+      ] 
+    : columns;
+
   const table = useDataTable({
     data,
-    columns,
+    columns: columnsWithActions,
     initialSorting,
     initialPageSize,
+    enableRowSelection,
   });
 
   useEffect(() => {
@@ -68,7 +93,10 @@ export function DataTable<TData>({
 
       {/* Mobile View */}
       <div className="md:hidden">
-        <DataTableMobile table={table} />
+        <DataTableMobile 
+          table={table} 
+          actionsColumnId={rowActions ? actionsColumnId : undefined}
+        />
       </div>
 
       <Card className="p-0">

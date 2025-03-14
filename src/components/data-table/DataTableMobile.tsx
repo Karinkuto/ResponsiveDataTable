@@ -17,12 +17,17 @@ interface DataTableMobileProps<TData> {
    * Optional custom render function for the summary
    */
   renderSummary?: (row: TData) => React.ReactNode;
+  /**
+   * Column ID for the actions column
+   */
+  actionsColumnId?: string;
 }
 
 export function DataTableMobile<TData>({ 
   table, 
   summaryColumns = ["name", "email", "status"],
   renderSummary,
+  actionsColumnId,
 }: DataTableMobileProps<TData>) {
   const [openItemId, setOpenItemId] = useState<string | null>(null);
 
@@ -38,9 +43,14 @@ export function DataTableMobile<TData>({
   return (
     <div className="grid gap-2">
       {table.getRowModel().rows.map((row) => {
-        // Get the columns to show in expanded view
+        // Find actions column if it exists
+        const actionsCell = actionsColumnId ? row.getVisibleCells().find(
+          cell => cell.column.id === actionsColumnId
+        ) : null;
+        
+        // Get the columns to show in expanded view, excluding actions
         const expandedColumns = row.getVisibleCells().filter(
-          cell => !summaryColumns.includes(cell.column.id) && cell.column.id !== "select"
+          cell => !summaryColumns.includes(cell.column.id) && cell.column.id !== actionsColumnId
         );
 
         // Get primary column value
@@ -63,14 +73,22 @@ export function DataTableMobile<TData>({
                         <span className="font-medium truncate">
                           {primaryValue || "Unnamed"}
                         </span>
-                        {status && (
-                          <Badge 
-                            variant="secondary"
-                            className="shrink-0"
-                          >
-                            {status}
-                          </Badge>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {status && (
+                            <Badge 
+                              variant="secondary"
+                              className="shrink-0"
+                            >
+                              {status}
+                            </Badge>
+                          )}
+                          {/* Add actions dropdown to the summary */}
+                          {actionsCell && (
+                            <div className="ml-2">
+                              {flexRender(actionsCell.column.columnDef.cell, actionsCell.getContext())}
+                            </div>
+                          )}
+                        </div>
                       </div>
                       {/* Secondary information */}
                       {summaryColumns.slice(1).map((columnId) => {
@@ -118,8 +136,7 @@ export function DataTableMobile<TData>({
                         return (
                           <TableRow
                             key={cell.id}
-                            data-state={row.getIsSelected() && "selected"}
-                            className="hover:bg-muted/50 data-[state=selected]:bg-muted border-b last:border-b-0 transition-colors"
+                            className="hover:bg-muted/50 border-b last:border-b-0 transition-colors"
                           >
                             <TableCell className="bg-muted/50 py-3 font-medium w-[35%]">
                               {headerContent}

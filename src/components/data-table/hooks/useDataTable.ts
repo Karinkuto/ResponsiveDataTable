@@ -14,6 +14,7 @@ interface UseDataTableProps<TData> {
   columns: ColumnDef<TData>[];
   initialSorting?: SortingState;
   initialPageSize?: number;
+  enableRowSelection?: boolean;
 }
 
 export function useDataTable<TData>({ 
@@ -21,6 +22,7 @@ export function useDataTable<TData>({
   columns, 
   initialSorting = [],
   initialPageSize = 5,
+  enableRowSelection = false,
 }: UseDataTableProps<TData>) {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -28,6 +30,7 @@ export function useDataTable<TData>({
   });
 
   const [sorting, setSorting] = useState<SortingState>(initialSorting);
+  const [rowSelection, setRowSelection] = useState({});
 
   const table = useReactTable({
     data,
@@ -38,9 +41,12 @@ export function useDataTable<TData>({
     enableSortingRemoval: false,
     getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
+    enableRowSelection,
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       pagination,
+      rowSelection,
     },
   });
 
