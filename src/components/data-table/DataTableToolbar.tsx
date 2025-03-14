@@ -139,11 +139,10 @@ export function DataTableToolbar<TData>({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="h-9 gap-1 border-border/40 hover:bg-muted/50"
+                    variant="outline"
+                    className="h-9"
                   >
-                    <Filter className="h-4 w-4" />
+                    <Filter className="h-4 w-4 mr-2" />
                     Filter
                     {isFiltered && (
                       <span className="ml-1 rounded-full bg-primary px-1.5 py-0.5 text-xs text-primary-foreground">
@@ -218,9 +217,9 @@ export function DataTableToolbar<TData>({
             {/* Reset filters button */}
             {isFiltered && (
               <Button
-                variant="ghost"
+                variant="outline"
                 onClick={() => table.resetColumnFilters()}
-                className="h-9 px-2 lg:px-3 text-muted-foreground hover:text-foreground"
+                className="h-9"
               >
                 Reset
                 <X className="ml-2 h-4 w-4" />
@@ -237,8 +236,8 @@ export function DataTableToolbar<TData>({
                   <TooltipTrigger asChild>
                     <Button 
                       variant="outline" 
-                      size="icon" 
-                      className="h-9 w-9 border-border/40"
+                      size="icon"
+                      className="h-9 w-9"
                       onClick={onRefreshClick}
                     >
                       <RefreshCw className="h-4 w-4" />
@@ -258,8 +257,8 @@ export function DataTableToolbar<TData>({
                   <TooltipTrigger asChild>
                     <Button 
                       variant="outline" 
-                      size="icon" 
-                      className="h-9 w-9 border-border/40"
+                      size="icon"
+                      className="h-9 w-9"
                       onClick={onExportClick}
                     >
                       <Download className="h-4 w-4" />
@@ -279,8 +278,8 @@ export function DataTableToolbar<TData>({
                   <TooltipTrigger asChild>
                     <Button 
                       variant="outline" 
-                      size="icon" 
-                      className="h-9 w-9 border-border/40"
+                      size="icon"
+                      className="h-9 w-9"
                       onClick={onImportClick}
                     >
                       <Upload className="h-4 w-4" />
@@ -298,16 +297,15 @@ export function DataTableToolbar<TData>({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-              <DropdownMenuTrigger asChild>
+                    <DropdownMenuTrigger asChild>
                       <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="h-9 gap-1 border-border/40"
+                        variant="outline"
+                        className="h-9"
                       >
-                  <Columns className="h-4 w-4" />
-                  Columns
-                </Button>
-              </DropdownMenuTrigger>
+                        <Columns className="h-4 w-4 mr-2" />
+                        Columns
+                      </Button>
+                    </DropdownMenuTrigger>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Toggle columns</p>
@@ -348,11 +346,10 @@ export function DataTableToolbar<TData>({
             {/* Add button */}
             {onAddClick && (
               <Button 
-                size="sm" 
-                className="h-9 gap-1 px-3" 
+                className="h-9" 
                 onClick={onAddClick}
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-4 w-4 mr-2" />
                 Add
               </Button>
             )}
