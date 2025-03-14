@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, VisibilityState } from "@tanstack/react-table";
 import { fetchTableData } from "@/data/sample-table-data";
 import { DataTable } from "./data-table/DataTable";
 import { toast } from "sonner";
-import { Copy, Eye, MoreHorizontal, Pencil } from "lucide-react";
+import { Copy, Eye, MoreHorizontal, Pencil, Plus, UserPlus } from "lucide-react";
 import { ActionItem, ActionGroup } from "./data-table/DataTableRowActions";
 
 export type TableItem = {
@@ -104,6 +104,7 @@ const columns: ColumnDef<TableItem>[] = [
     header: "Department",
     accessorKey: "department",
     size: 150,
+    filterFn: "arrIncludesSome",
   },
   {
     header: "Role",
@@ -155,6 +156,7 @@ const columns: ColumnDef<TableItem>[] = [
       </Badge>
     ),
     size: 120,
+    filterFn: "arrIncludesSome",
   },
   {
     header: "Balance",
@@ -173,6 +175,9 @@ const columns: ColumnDef<TableItem>[] = [
 
 export default function UsersTable() {
   const [data, setData] = useState<TableItem[]>([]);
+  const [columnVisibility] = useState<VisibilityState>({
+    balance: false,
+  });
 
   useEffect(() => {
     fetchTableData().then(setData);
@@ -180,7 +185,6 @@ export default function UsersTable() {
 
   // Example of custom action handlers
   const handleView = (user: TableItem) => {
-    console.log("Custom view handler", user); // Debug log
     toast.info(`Viewing details for ${user.name}`, {
       description: `Email: ${user.email}\nDepartment: ${user.department}\nRole: ${user.role}`,
     });
@@ -217,6 +221,38 @@ export default function UsersTable() {
     ],
   };
 
+  // Handle add new user
+  const handleAddUser = () => {
+    toast.success("Add new user", {
+      description: "Opening new user form...",
+      icon: <UserPlus className="h-4 w-4" />,
+    });
+  };
+
+  // Define filterable columns
+  const filterableColumns = [
+    {
+      id: "status",
+      title: "Status",
+      options: [
+        { label: "Active", value: "Active" },
+        { label: "Inactive", value: "Inactive" },
+        { label: "Pending", value: "Pending" },
+      ],
+    },
+    {
+      id: "department",
+      title: "Department",
+      options: [
+        { label: "Engineering", value: "Engineering" },
+        { label: "Marketing", value: "Marketing" },
+        { label: "Sales", value: "Sales" },
+        { label: "Product", value: "Product" },
+        { label: "Finance", value: "Finance" },
+      ],
+    },
+  ];
+
   console.log("Rendering UsersTable with actions:", [...actions, customActions]); // Debug log
 
   return (
@@ -227,6 +263,10 @@ export default function UsersTable() {
         initialSorting={[{ id: "name", desc: false }]}
         initialPageSize={5}
         rowActions={[...actions, customActions]}
+        searchColumn="name"
+        onAddClick={handleAddUser}
+        filterableColumns={filterableColumns}
+        initialColumnVisibility={columnVisibility}
       />
     </div>
   );

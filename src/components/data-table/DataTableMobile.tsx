@@ -4,13 +4,15 @@ import { flexRender } from "@tanstack/react-table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DataTableAccordion } from "./DataTableAccordion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import React from "react";
 
 interface DataTableMobileProps<TData> {
   table: TableType<TData>;
   /**
    * Column IDs to show in the accordion summary.
    * First column is treated as the title.
+   * If not provided, the first 2-4 columns will be used (min 2, max 4).
    */
   summaryColumns?: string[];
   /**
@@ -25,11 +27,35 @@ interface DataTableMobileProps<TData> {
 
 export function DataTableMobile<TData>({ 
   table, 
-  summaryColumns = ["name", "email", "status"],
+  summaryColumns = [],
   renderSummary,
   actionsColumnId,
 }: DataTableMobileProps<TData>) {
   const [openItemId, setOpenItemId] = useState<string | null>(null);
+  
+  // Store original column visibility state
+  const [originalColumnVisibility, setOriginalColumnVisibility] = useState({});
+  
+  // When component mounts, save the original column visibility and make all columns visible
+  useEffect(() => {
+    // Save original visibility state
+    const currentVisibility = table.getState().columnVisibility;
+    setOriginalColumnVisibility(currentVisibility);
+    
+    // Make all columns visible in mobile view
+    const allColumns = table.getAllColumns();
+    const allVisible = allColumns.reduce((acc, column) => {
+      acc[column.id] = true;
+      return acc;
+    }, {} as Record<string, boolean>);
+    
+    table.setColumnVisibility(allVisible);
+    
+    // Restore original visibility when component unmounts
+    return () => {
+      table.setColumnVisibility(currentVisibility);
+    };
+  }, [table]);
 
   const toggleItem = (id: string) => {
     setOpenItemId(prev => prev === id ? null : id);
@@ -48,7 +74,7 @@ export function DataTableMobile<TData>({
           cell => cell.column.id === actionsColumnId
         ) : null;
         
-        // Get the columns to show in expanded view, excluding actions
+        // Get the columns to show in expanded view, excluding actions and summary columns
         const expandedColumns = row.getVisibleCells().filter(
           cell => !summaryColumns.includes(cell.column.id) && cell.column.id !== actionsColumnId
         );
@@ -56,6 +82,7 @@ export function DataTableMobile<TData>({
         // Get primary column value
         const primaryValue = getRowValue(row, summaryColumns[0]);
         const status = getRowValue(row, "status");
+        const hasStatus = summaryColumns.includes("status");
 
         return (
           <Card key={row.id} className="p-0">
@@ -68,13 +95,13 @@ export function DataTableMobile<TData>({
                     renderSummary(row.original)
                   ) : (
                     <div className="flex flex-col gap-2 min-h-[2.5rem]">
-                      {/* Primary information */}
+                      {/* Primary information - First row */}
                       <div className="flex items-center justify-between gap-4">
                         <span className="font-medium truncate">
                           {primaryValue || "Unnamed"}
                         </span>
                         <div className="flex items-center gap-2">
-                          {status && (
+                          {hasStatus && status && (
                             <Badge 
                               variant="secondary"
                               className="shrink-0"
@@ -90,34 +117,27 @@ export function DataTableMobile<TData>({
                           )}
                         </div>
                       </div>
-                      {/* Secondary information */}
-                      {summaryColumns.slice(1).map((columnId) => {
-                        if (columnId === "status") return null; // Skip status as it's shown above
-                        const value = getRowValue(row, columnId);
-                        if (!value) return null;
-                        
-                        const header = table.getHeaderGroups()[0].headers.find(
-                          h => h.id === columnId
-                        );
-                        const headerContent = header?.column.columnDef.header;
-                        const headerString = typeof headerContent === "string" 
-                          ? headerContent 
-                          : columnId;
-                        
-                        return (
-                          <div 
-                            key={columnId}
-                            className="text-sm text-muted-foreground flex items-center gap-2"
-                          >
-                            <span className="font-medium">
-                              {headerString}:
-                            </span>
-                            <span className="truncate">
-                              {value}
-                            </span>
-                          </div>
-                        );
-                      })}
+                      
+                      {/* Secondary information - Second row with dot separators */}
+                      <div className="text-sm text-muted-foreground flex flex-wrap items-center">
+                        {(() => {
+                          // Filter and prepare the values to display
+                          const secondaryValues = summaryColumns.slice(1)
+                            .filter(columnId => !(columnId === "status" && hasStatus)) // Skip status if shown as badge
+                            .map(columnId => getRowValue(row, columnId))
+                            .filter(value => value); // Remove empty values
+                          
+                          if (secondaryValues.length === 0) return null;
+                          
+                          // Return the values with dot separators
+                          return secondaryValues.map((value, index) => (
+                            <React.Fragment key={index}>
+                              {index > 0 && <span className="mx-1.5 text-muted-foreground/60">•</span>}
+                              <span className="truncate">{value}</span>
+                            </React.Fragment>
+                          ));
+                        })()}
+                      </div>
                     </div>
                   )
                 }
