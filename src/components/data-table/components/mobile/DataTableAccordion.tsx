@@ -1,7 +1,6 @@
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { ReactNode } from "react";
 // Import types from the shared types directory
 import { DataTableAccordionProps } from "../../types/table.types";
 

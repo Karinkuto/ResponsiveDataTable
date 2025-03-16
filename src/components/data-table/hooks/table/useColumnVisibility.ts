@@ -1,4 +1,4 @@
-import { Table } from "@tanstack/react-table";
+import { Table, VisibilityState } from "@tanstack/react-table";
 import { useEffect, useState, useCallback } from "react";
 
 /**
@@ -9,7 +9,7 @@ export function useColumnVisibility<TData>(
   table: Table<TData>,
   makeAllVisible = false
 ) {
-  const [originalVisibility, setOriginalVisibility] = useState({});
+  const [originalVisibility, setOriginalVisibility] = useState<VisibilityState>({});
   
   // Save current visibility and apply new visibility settings
   const saveAndRestore = useCallback((shouldMakeAllVisible: boolean) => {
@@ -43,7 +43,7 @@ export function useColumnVisibility<TData>(
   
   // Function to manually restore original visibility
   const restoreVisibility = useCallback(() => {
-    table.setColumnVisibility(originalVisibility as any);
+    table.setColumnVisibility(originalVisibility);
   }, [table, originalVisibility]);
   
   return {

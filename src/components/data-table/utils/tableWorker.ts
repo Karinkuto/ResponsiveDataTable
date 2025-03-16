@@ -20,7 +20,7 @@ type FilterOperation<T> = {
   data: T[];
   filters: {
     id: string;
-    value: any;
+    value: unknown;
   }[];
 };
 
@@ -54,7 +54,7 @@ const sortData = <T>(data: T[], sortBy: { id: string; desc: boolean }[]) => {
   });
 };
 
-const filterData = <T>(data: T[], filters: { id: string; value: any }[]) => {
+const filterData = <T>(data: T[], filters: { id: string; value: unknown }[]) => {
   if (!filters || filters.length === 0) return data;
   
   return data.filter(item => {
@@ -144,7 +144,7 @@ export function createTableWorker<T>() {
     sortData: (data: T[], sortBy: { id: string; desc: boolean }[]) => 
       processDataAsync<T, T[]>({ type: 'sort', data, sortBy }),
       
-    filterData: (data: T[], filters: { id: string; value: any }[]) => 
+    filterData: (data: T[], filters: { id: string; value: unknown }[]) => 
       processDataAsync<T, T[]>({ type: 'filter', data, filters }),
       
     searchData: (data: T[], searchTerm: string, searchColumns: string[]) => 

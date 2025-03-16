@@ -11,10 +11,13 @@ import {
   getSortedRowModel,
   useReactTable,
   FilterFn,
+  Row,
+  FilterMeta,
 } from "@tanstack/react-table";
 
 // Custom filter function for handling array values
-const arrayFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const arrayFilterFn: FilterFn<unknown> = (row, columnId, filterValue, _addMeta) => {
   if (!Array.isArray(filterValue) || filterValue.length === 0) {
     return true;
   }
@@ -23,7 +26,8 @@ const arrayFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
 };
 
 // Custom filter function for handling string searches
-const stringFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const stringFilterFn: FilterFn<unknown> = (row, columnId, filterValue, _addMeta) => {
   if (filterValue === undefined || filterValue === null || filterValue === "" || typeof filterValue !== 'string') {
     return true;
   }
@@ -64,12 +68,12 @@ export function useDataTable<TData>({
 
   // Define a stable filter function using useCallback with empty deps array
   // since this function doesn't depend on any external variables
-  const filterFn = useCallback((row: any, columnId: string, value: any) => {
+  const filterFn = useCallback((row: Row<unknown>, columnId: string, value: unknown, addMeta: (meta: FilterMeta) => void) => {
     if (Array.isArray(value)) {
-      return arrayFilterFn(row, columnId, value);
+      return arrayFilterFn(row, columnId, value, addMeta);
     }
     if (typeof value === 'string') {
-      return stringFilterFn(row, columnId, value);
+      return stringFilterFn(row, columnId, value, addMeta);
     }
     return true;
   }, []);

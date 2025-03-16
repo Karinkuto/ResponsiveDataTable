@@ -1,4 +1,3 @@
-import { Table } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { X, Search, Filter, Plus, Check, Download, Upload, RefreshCw, MoreHorizontal, Columns } from "lucide-react";
@@ -148,17 +147,15 @@ export function DataTableToolbarMobile<TData>({
                     <DropdownMenuSub key={column.id}>
                       <DropdownMenuSubTrigger>
                         <span>{column.title}</span>
-                        {table.getColumn(column.id)?.getFilterValue() && (
+                        {table.getColumn(column.id)?.getFilterValue() !== undefined && (
                           <Check className="ml-auto h-4 w-4" />
                         )}
                       </DropdownMenuSubTrigger>
                       <DropdownMenuPortal>
                         <DropdownMenuSubContent>
                           {column.options.map((option) => {
-                            const isSelected = 
-                              (table.getColumn(column.id)?.getFilterValue() as string[])?.includes(
-                                option.value
-                              );
+                            const filterValue = table.getColumn(column.id)?.getFilterValue();
+                            const isSelected = Array.isArray(filterValue) && filterValue.includes(option.value);
                             
                             return (
                               <DropdownMenuCheckboxItem
@@ -168,15 +165,15 @@ export function DataTableToolbarMobile<TData>({
                                   if (checked) {
                                     table.getColumn(column.id)?.setFilterValue(
                                       [
-                                        ...(table.getColumn(column.id)?.getFilterValue() as string[] || []),
+                                        ...(Array.isArray(filterValue) ? filterValue : []),
                                         option.value,
                                       ]
                                     );
                                   } else {
                                     table.getColumn(column.id)?.setFilterValue(
-                                      (table.getColumn(column.id)?.getFilterValue() as string[])?.filter(
+                                      Array.isArray(filterValue) ? filterValue.filter(
                                         (value) => value !== option.value
-                                      )
+                                      ) : []
                                     );
                                   }
                                 }}

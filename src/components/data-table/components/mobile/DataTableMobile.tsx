@@ -1,5 +1,5 @@
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { Table as TableType, Row } from "@tanstack/react-table";
+import { Row } from "@tanstack/react-table";
 import { flexRender } from "@tanstack/react-table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

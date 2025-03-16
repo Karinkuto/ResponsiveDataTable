@@ -1,4 +1,4 @@
-import { ColumnDef, Table as TableType, Row, SortingState, VisibilityState } from "@tanstack/react-table";
+import { ColumnDef, Table as TableType, SortingState, VisibilityState } from "@tanstack/react-table";
 import type { ReactNode } from "react";
 import { ActionItem, ActionGroup } from "../components/actions";
 
@@ -85,7 +85,7 @@ export interface DataTableToolbarProps<TData> {
 }
 
 // Mobile toolbar props - extends the main toolbar props
-export interface DataTableToolbarMobileProps<TData> extends DataTableToolbarProps<TData> {}
+export type DataTableToolbarMobileProps<TData> = DataTableToolbarProps<TData>;
 
 // Table header props
 export interface DataTableHeaderProps<TData> {

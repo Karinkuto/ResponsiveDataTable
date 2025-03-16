@@ -51,12 +51,12 @@ function VirtualizedTableComponent<TData>({
       
       {/* Virtualized Table Body */}
       <TableBody
-        ref={parentRef}
         className="relative"
         style={{ height: `${totalSize}px` }}
       >
-        {/* Spacer to maintain scroll position */}
+        {/* Container div with the reference needed for virtualization */}
         <div
+          ref={parentRef}
           style={{
             height: `${totalSize}px`,
             width: '100%',

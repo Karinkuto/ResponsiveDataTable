@@ -1,4 +1,4 @@
-import { ColumnDef, SortingState, VisibilityState } from "@tanstack/react-table";
+import { SortingState } from "@tanstack/react-table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,7 +9,7 @@ import { useResponsive } from "./hooks/ui/useResponsive";
 import { DataTableProps } from "./types/table.types";
 import { useTableVirtualizer } from "./utils/virtualizer";
 import { useTableWorker } from "./utils/tableWorker";
-import React, { lazy, Suspense, memo, useEffect, useMemo, useState, useCallback } from "react";
+import React, { lazy, Suspense, useEffect, useMemo, useState, useCallback } from "react";
 
 // Lazy load all components for better initial loading performance
 const DataTableHeader = lazy(() => import("./components/core/DataTableHeader").then(
@@ -80,17 +80,16 @@ function DataTableComponent<TData>({
 }) {
   const { isMobile } = useResponsive();
   
-  // Initialize worker if enabled and data exceeds threshold
-  const tableWorker = useMemo(
-    () => enableWorkers ? useTableWorker<TData>() : null,
-    [enableWorkers]
-  );
+  // Initialize worker - call the hook unconditionally to follow React rules
+  const tableWorker = useTableWorker<TData>();
+  // Only use the worker if enabled
+  const effectiveTableWorker = enableWorkers ? tableWorker : null;
   
   // Track original data and processed data
   const [processedData, setProcessedData] = useState(data);
   
   // Use worker for sorting if available
-  const [sorting, setSorting] = useState<SortingState>(initialSorting || []);
+  const [sorting] = useState<SortingState>(initialSorting || []);
   
   // Move hook calls to the top level - don't call hooks inside useMemo
   const tableColumnsWithActions = useTableColumns(columns, rowActions, actionsColumnId);
@@ -105,9 +104,9 @@ function DataTableComponent<TData>({
   useEffect(() => {
     let isMounted = true;
     
-    if (tableWorker && enableWorkers && sorting.length > 0) {
+    if (effectiveTableWorker && enableWorkers && sorting.length > 0) {
       // Process data in worker
-      tableWorker.sortData(data, sorting).then(result => {
+      effectiveTableWorker.sortData(data, sorting).then(result => {
         if (isMounted) {
           setProcessedData(result);
         }
@@ -118,7 +117,7 @@ function DataTableComponent<TData>({
     }
     
     return () => { isMounted = false; };
-  }, [data, sorting, tableWorker, enableWorkers]);
+  }, [data, sorting, effectiveTableWorker, enableWorkers]);
 
   // Create the table instance with either processed or original data
   const table = useDataTable({
@@ -129,19 +128,6 @@ function DataTableComponent<TData>({
     enableRowSelection,
     initialColumnVisibility,
   });
-  
-  // Override the sorting state handler to use worker when available
-  useEffect(() => {
-    if (enableWorkers) {
-      const originalOnSortingChange = table.getState().sorting;
-      table.setColumnOrder = (updater) => {
-        const newSorting = typeof updater === 'function' 
-          ? updater(originalOnSortingChange) 
-          : updater;
-        setSorting(newSorting);
-      };
-    }
-  }, [table, enableWorkers]);
 
   // Move hook call to the top level - don't call hooks inside useMemo
   const tableSummaryColumns = useSummaryColumns(table, summaryColumns, actionsColumnId);
@@ -240,6 +226,29 @@ function DataTableComponent<TData>({
     }
   }, [isLoading]);
 
+  // Create type-safe props objects for components
+  const virtualizedTableProps = useMemo(() => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    table: table as any, // Type assertion needed due to generic incompatibility
+    virtualizer,
+  }), [table, virtualizer]);
+
+  const headerProps = useMemo(() => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    table: table as any, // Type assertion needed due to generic incompatibility
+  }), [table]);
+
+  const bodyProps = useMemo(() => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    table: table as any, // Type assertion needed due to generic incompatibility
+  }), [table]);
+
+  const paginationProps = useMemo(() => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    table: table as any, // Type assertion needed due to generic incompatibility
+    isMobile,
+  }), [table, isMobile]);
+
   // Modify renderTableContent to use the combined loading state
   const renderTableContent = useCallback(() => {
     // If loading or in initial skeleton state, show skeleton UI
@@ -251,9 +260,8 @@ function DataTableComponent<TData>({
     if (virtualizer.isEnabled && virtualizer.virtualRows.length > 0) {
       return (
         <Suspense fallback={<TableSkeleton />}>
-          <VirtualizedTable 
-            table={table} 
-            virtualizer={virtualizer} 
+          <VirtualizedTable
+            {...virtualizedTableProps}
           />
         </Suspense>
       );
@@ -263,12 +271,12 @@ function DataTableComponent<TData>({
     return (
       <Suspense fallback={<TableSkeleton />}>
         <>
-          <DataTableHeader table={table} />
-          <DataTableBody table={table} />
+          <DataTableHeader {...headerProps} />
+          <DataTableBody {...bodyProps} />
         </>
       </Suspense>
     );
-  }, [table, virtualizer, isLoading, showSkeletons, TableSkeleton]);
+  }, [virtualizer, isLoading, showSkeletons, TableSkeleton, virtualizedTableProps, headerProps, bodyProps]);
 
   // Simple toolbar skeleton for desktop - simplified to a single block
   const DesktopToolbarSkeleton = () => (
@@ -357,7 +365,8 @@ function DataTableComponent<TData>({
           <DesktopToolbarSkeleton />
         ) : (
           <Suspense fallback={<DesktopToolbarSkeleton />}>
-            <DataTableToolbar {...toolbarProps} />
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            <DataTableToolbar {...toolbarProps as any} />
           </Suspense>
         )}
       </div>
@@ -368,7 +377,8 @@ function DataTableComponent<TData>({
           <MobileToolbarSkeleton />
         ) : (
           <Suspense fallback={<MobileToolbarSkeleton />}>
-            <DataTableToolbarMobile {...toolbarProps} />
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            <DataTableToolbarMobile {...toolbarProps as any} />
           </Suspense>
         )}
       </div>
@@ -390,7 +400,8 @@ function DataTableComponent<TData>({
           <MobileAccordionSkeletons />
         ) : (
           <Suspense fallback={<MobileAccordionSkeletons />}>
-            <DataTableMobile {...mobileProps} />
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            <DataTableMobile {...mobileProps as any} />
           </Suspense>
         )}
       </div>
@@ -400,9 +411,8 @@ function DataTableComponent<TData>({
         <PaginationSkeleton />
       ) : (
         <Suspense fallback={<PaginationSkeleton />}>
-          <DataTablePagination 
-            table={table} 
-            isMobile={isMobile}
+          <DataTablePagination
+            {...paginationProps}
           />
         </Suspense>
       )}
