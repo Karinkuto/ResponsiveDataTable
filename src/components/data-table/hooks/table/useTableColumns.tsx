@@ -12,7 +12,7 @@ export function useTableColumns<TData>(
   rowActions?: (ActionItem<TData> | ActionGroup<TData>)[],
   actionsColumnId = "actions"
 ): ColumnDef<TData>[] {
-  return useMemo(() => {
+  const memoizedColumns = useMemo(() => {
     const columnsWithSettings = columns.map(col => ({
       ...col,
       enableHiding: col.enableHiding ?? true,
@@ -37,4 +37,6 @@ export function useTableColumns<TData>(
       } as ColumnDef<TData>,
     ];
   }, [columns, rowActions, actionsColumnId]);
+  
+  return memoizedColumns;
 } 

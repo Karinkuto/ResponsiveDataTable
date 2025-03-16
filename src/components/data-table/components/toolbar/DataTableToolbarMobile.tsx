@@ -104,11 +104,9 @@ export function DataTableToolbarMobile<TData>({
             {/* Add button */}
             {onAddClick && (
               <Button 
-                size="sm" 
-                className="h-9 gap-1 px-3 border border-border/40" 
                 onClick={onAddClick}
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-4 w-4 mr-2" />
                 Add
               </Button>
             )}
@@ -118,7 +116,7 @@ export function DataTableToolbarMobile<TData>({
               <Button
                 variant="ghost"
                 onClick={() => table.resetColumnFilters()}
-                className="h-9 w-9 p-0 border border-border/40"
+                className="h-9 p-0"
                 aria-label="Reset filters"
               >
                 <X className="h-4 w-4" />
@@ -132,11 +130,9 @@ export function DataTableToolbarMobile<TData>({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="h-9 gap-1 border-border/40 hover:bg-muted/50"
+                    variant="outline"
                   >
-                    <Filter className="h-4 w-4" />
+                    <Filter className="h-4 w-4 mr-2" />
                     Filter
                     {isFiltered && (
                       <span className="ml-1 rounded-full bg-primary px-1.5 py-0.5 text-xs text-primary-foreground">
@@ -213,11 +209,9 @@ export function DataTableToolbarMobile<TData>({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="h-9 gap-1 border-border/40"
+                    variant="outline"
                   >
-                    <Columns className="h-4 w-4" />
+                    <Columns className="h-4 w-4 mr-2" />
                     Columns
                   </Button>
                 </DropdownMenuTrigger>
@@ -259,8 +253,8 @@ export function DataTableToolbarMobile<TData>({
                 <DropdownMenuTrigger asChild>
                   <Button 
                     variant="outline" 
-                    size="icon" 
-                    className="h-9 w-9 border-border/40"
+                    size="icon"
+                    className="h-9 w-9"
                   >
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>

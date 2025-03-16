@@ -35,6 +35,10 @@ export interface DataTableProps<TData> {
    * If not provided, the first 2-4 columns will be used.
    */
   summaryColumns?: string[];
+  /**
+   * Whether the data is loading. When true, a skeleton UI will be displayed.
+   */
+  isLoading?: boolean;
 }
 
 // Mobile table props

@@ -1,5 +1,5 @@
 import { Table } from "@tanstack/react-table";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { debounce } from "lodash-es";
 
 /**
@@ -18,15 +18,15 @@ export function useTableSearch<TData>(
   
   const [searchValue, setSearchValue] = useState("");
   
-  // Create debounced search function with lodash
-  // Use useRef to ensure the same debounced function instance persists between renders
-  const debouncedSearch = useRef(
-    debounce((value: string, columnId: string | undefined) => {
+  // Create a stable version of the debounce function with useMemo instead of useRef
+  const debouncedSearch = useMemo(
+    () => debounce((value: string, columnId: string | undefined) => {
       if (columnId) {
         table.getColumn(columnId)?.setFilterValue(value);
       }
-    }, debounceMs)
-  ).current;
+    }, debounceMs),
+    [table, debounceMs] // Only recreate when table or debounceMs changes
+  );
   
   // Clean up debounced function on unmount
   useEffect(() => {
@@ -41,6 +41,7 @@ export function useTableSearch<TData>(
     : "";
     
   // Update search input without triggering immediate table filter
+  // Optimize with useCallback to maintain stable function reference
   const handleSearch = useCallback((value: string) => {
     setSearchValue(value);
     if (selectedSearchColumn) {
@@ -48,7 +49,7 @@ export function useTableSearch<TData>(
     }
   }, [selectedSearchColumn, debouncedSearch]);
   
-  // Handle search column change
+  // Handle search column change - optimize with useCallback
   const handleSearchColumnChange = useCallback((columnId: string) => {
     // If there's an active search, apply it to the new column
     if (searchValue) {
@@ -68,7 +69,7 @@ export function useTableSearch<TData>(
     }
   }, [selectedSearchColumn, searchValue, table, debouncedSearch]);
   
-  // Clear search function
+  // Clear search function - optimize with useCallback
   const clearSearch = useCallback(() => {
     setSearchValue("");
     if (selectedSearchColumn) {
